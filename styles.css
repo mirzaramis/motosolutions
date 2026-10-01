@@ -413,13 +413,30 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 @media (max-width: 760px) {
-  /* Portrait crop: keep the helmet (left of the image) in frame */
-  .hero--banner { min-height: 76vh; }
-  .hero--banner .hero__media { background-position: 30% center; }
-  .hero--banner .hero__overlay {
-    background:
-      linear-gradient(180deg, rgba(7,8,11,0.15) 30%, rgba(7,8,11,0.72) 68%, var(--bg));
+  /* Show the WHOLE 16:9 banner (helmet + baked-in tagline) — no side crop —
+     then stack the buttons neatly beneath it instead of overlaying. */
+  .hero--banner {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: auto;
   }
+  .hero--banner .hero__media {
+    position: relative;
+    inset: auto;
+    z-index: 0;
+    width: 100%;
+    aspect-ratio: 16 / 9;          /* matches the image → cover shows it fully */
+    background-size: cover;
+    background-position: center;
+  }
+  .hero--banner .hero__overlay { display: none; }
+  .hero--banner .hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 22px var(--gut) 10px;
+  }
+  .hero--banner .hero__cta { justify-content: center; }
   .hero--banner .scroll-hint { display: none; }
 }
 .hero__content {
