@@ -1,0 +1,17 @@
+# Netlify headers — long cache for static media, revalidate HTML so updates show
+/media/*
+  Cache-Control: public, max-age=2592000
+/img/*
+  Cache-Control: public, max-age=2592000
+/*.css
+  Cache-Control: public, max-age=86400
+/*.js
+  Cache-Control: public, max-age=86400
+/logo.png
+  Cache-Control: public, max-age=2592000
+/favicon.png
+  Cache-Control: public, max-age=2592000
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
