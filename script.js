@@ -50,7 +50,7 @@
       card.setAttribute("aria-label", "View " + h.name + " — " + h.shots.length + " photos");
       card.innerHTML =
         '<div class="card__media">' +
-          '<img class="helmet__img" src="' + h.cover + '" alt="' + h.name + ' — ' + h.model + '" loading="lazy" />' +
+          '<img class="helmet__img" src="' + h.cover + '" alt="' + h.name + ' — ' + h.model + '" loading="lazy" decoding="async" />' +
           '<span class="helmet__count">' +
             '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="13" rx="2.5"/><path d="M3.5 14l4.5-4 4 3.5 3.5-3 5 4.5"/><circle cx="9" cy="9" r="1.4" fill="currentColor" stroke="none"/></svg>' +
             h.shots.length +
@@ -247,8 +247,9 @@
     }
 
     function loadAndPlay(v) {
+      if (!inView) return;                                  // don't fetch any reel until the strip is on screen
       if (!v.src && v.dataset.src) v.src = v.dataset.src;   // lazy-load
-      if (!reduce && inView) v.play().catch(function () {});
+      if (!reduce) v.play().catch(function () {});
     }
 
     function setActive(i) {
@@ -323,12 +324,43 @@
     }
   })();
 
-  /* ---- Launch cinematic: scroll-scrub the video frame-by-frame ---- */
+  /* ---- Launch cinematic ----
+     Desktop: scroll-scrub the video frame-by-frame.
+     Mobile / touch / reduced-motion: no scrub (janky + traps scroll) — the clip
+     plays inline, muted, looping, only while on screen.
+     The source is lazy-loaded either way, so nothing downloads on first paint. */
   (function launch() {
     var sec = document.getElementById("launch");
     var video = document.getElementById("launchVideo");
     if (!sec || !video) return;
+
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var simple = reduce || window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+
+    var loaded = false;
+    function loadVideo() {
+      if (loaded || !video.dataset.src) return;
+      loaded = true;
+      video.src = video.dataset.src;
+      try { video.load(); } catch (e) {}
+    }
+
+    /* ----- Mobile / reduced-motion: inline autoplay-loop while visible ----- */
+    if (simple) {
+      sec.classList.add("is-simple");
+      video.loop = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting) { loadVideo(); if (!reduce) video.play().catch(function () {}); }
+            else { try { video.pause(); } catch (x) {} }
+          });
+        }, { threshold: 0.2 }).observe(sec);
+      } else { loadVideo(); }
+      return;
+    }
+
+    /* ----- Desktop: scroll-scrub ----- */
     var vh = window.innerHeight;
     var duration = 0;
 
@@ -360,9 +392,13 @@
       try { video.pause(); } catch (e) {}
       tick();
     });
-    if (video.readyState >= 1) { duration = video.duration || 0; tick(); }
 
-    if (reduce) return;   // no scrubbing; first frame stays
+    // Load the clip only when the section is getting close (not on first paint)
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) loadVideo(); });
+      }, { rootMargin: "60% 0px" }).observe(sec);
+    } else { loadVideo(); }
 
     var ticking = false;
     window.addEventListener("scroll", function () {

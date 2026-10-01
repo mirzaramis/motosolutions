@@ -13,12 +13,15 @@
   <meta property="og:description" content="AGV & Alpinestars flagship racing helmets, imported one piece at a time. No replicas. No mass stock." />
   <meta property="og:type" content="website" />
 
+  <!-- Preload the LCP hero image (it's a CSS background, so discovered late) -->
+  <link rel="preload" as="image" href="img/hero.jpg" fetchpriority="high" />
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=26" />
+  <link rel="stylesheet" href="styles.css?v=27" />
 </head>
 <body>
 
@@ -101,8 +104,8 @@
     <section class="launch" id="launch" aria-label="Gear up and ride">
       <div class="launch__stage" id="launchStage">
         <!-- scroll-scrubbed cinematic: currentTime follows scroll progress -->
-        <video class="launch__video" id="launchVideo" src="media/hero-scroll2.mp4"
-               muted playsinline preload="auto" aria-hidden="true"></video>
+        <video class="launch__video" id="launchVideo" data-src="media/hero-scroll2.mp4"
+               muted playsinline preload="none" aria-hidden="true"></video>
         <div class="launch__vignette" aria-hidden="true"></div>
         <span class="launch__hint" aria-hidden="true">SCROLL</span>
       </div>
@@ -134,7 +137,7 @@
       <span class="ghost-num" aria-hidden="true">01</span>
       <div class="wrap auth__grid">
         <div class="auth__media">
-          <img class="auth__img" src="img/rider.jpg?v=4" alt="Rider wearing a genuine AGV helmet" loading="lazy" width="900" height="1200" />
+          <img class="auth__img" src="img/rider.jpg?v=4" alt="Rider wearing a genuine AGV helmet" loading="lazy" decoding="async" width="900" height="1200" />
           <span class="auth__stat">
             <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
             <b>1,350+</b> following on Instagram
@@ -324,7 +327,7 @@
     </div>
   </div>
 
-  <script src="helmets.js?v=4"></script>
-  <script src="script.js?v=14"></script>
+  <script src="helmets.js?v=4" defer></script>
+  <script src="script.js?v=15" defer></script>
 </body>
 </html>
